@@ -3,10 +3,12 @@ package com.tpirates.market.product;
 import com.tpirates.market.product.dto.*;
 import com.tpirates.market.product.entity.Product;
 import com.tpirates.market.product.entity.ProductOption;
+import com.tpirates.market.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,17 +31,17 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> readAll() {
         List<Product> productList = productRepository.findAll();
         List<ProductDto> productDto = new ArrayList<>();
-        productList.stream().sorted(Comparator.comparing(Product::getCreatedAt).reversed()).forEach(product -> {
+        productList.stream().sorted(Comparator.comparing(Product::getId).reversed()).forEach(product -> {
             Optional<ProductOption> minPrice = product.getOptions().stream().min(Comparator.comparingLong(ProductOption::getPrice));
-            Long price = 0L;
+            String price = "";
             if (minPrice.isPresent()) {
-                price = minPrice.get().getPrice();
+                price = NumberFormat.getInstance().format(minPrice.get().getPrice()) + " ~ ";
             }
             productDto.add(
                     ProductDto.builder()
                             .name(product.getName())
                             .description(product.getDescription())
-                            .price(Long.toString(price))
+                            .price(price)
                             .build()
             );
         });
@@ -64,6 +66,11 @@ public class ProductServiceImpl implements ProductService {
                     .options(productDetailOptionDtos)
                     .build();
         }
+        return null;
+    }
+
+    @Override
+    public List<ProductDeliveryDateDto> readDeliveryDate(Long productId) {
         return null;
     }
 

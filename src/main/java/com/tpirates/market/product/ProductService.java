@@ -1,5 +1,6 @@
 package com.tpirates.market.product;
 
+import com.tpirates.market.product.dto.ProductDeliveryDateDto;
 import com.tpirates.market.product.dto.ProductDetailDto;
 import com.tpirates.market.product.dto.ProductDto;
 import com.tpirates.market.product.dto.ProductPostDto;
@@ -13,10 +14,12 @@ public interface ProductService {
 
     List<ProductDto> readAll();
 
-    ProductDetailDto readOne(Long id);
+    ProductDetailDto readOne(Long productId);
+
+    List<ProductDeliveryDateDto> readDeliveryDate(Long productId);
 
     Product update(ProductPostDto productPostDto);
 
-    void delete(Long id);
+    void delete(Long productId);
 
 }

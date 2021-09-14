@@ -1,32 +1,41 @@
 package com.tpirates.market.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tpirates.market.product.dto.ProductDetailDto;
+import com.tpirates.market.product.dto.ProductDeliveryDateDto;
 import com.tpirates.market.product.dto.ProductDto;
 import com.tpirates.market.product.dto.ProductPostDto;
 import com.tpirates.market.product.entity.Product;
+import com.tpirates.market.product.repository.MemoryProductRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Transactional
 class ProductServiceImplTest {
 
-    @Autowired
-    private ProductService productService;
+    private MemoryProductRepository memoryProductRepository = new MemoryProductRepository();
+    private ProductService productService = new ProductServiceImpl(memoryProductRepository);
+//    private ProductService productService = new ProductServiceImpl(new MemoryProductRepository());
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    @AfterEach
+    void tearDown() {
+        memoryProductRepository.clearStore();
+    }
+
     @Test
-    @DisplayName("상품 추가")
+    @DisplayName("점포 추가 API")
     void productCreate() throws JsonProcessingException {
         ProductPostDto product = mapper.readValue("{\n" +
                 "    \"name\": \"노르웨이산 연어\",\n" +
@@ -61,8 +70,8 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("상품 목록 조회")
-    void productList() throws JsonProcessingException {
+    @DisplayName("상품 목록 조회 API")
+    void readProductList() throws JsonProcessingException {
         ProductPostDto product1 = mapper.readValue("{\n" +
                 "    \"name\": \"노르웨이산 연어\",\n" +
                 "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
@@ -113,26 +122,66 @@ class ProductServiceImplTest {
         productService.create(product1);
         productService.create(product2);
 
+
         List<ProductDto> productDto = productService.readAll();
 
-        System.out.println("productDto = " + productDto);
+        String answer = "[\n" +
+                "    {\n" +
+                "        \"name\": \"완도전복\",\n" +
+                "        \"description\": \"산지직송 완도 전복 1kg (7미~60미)\",\n" +
+                "        \"price\": \"20,000 ~ \"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"name\": \"노르웨이산 연어\",\n" +
+                "        \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
+                "        \"price\": \"10,000 ~ \"\n" +
+                "    }\n" +
+                "]";
 
-//        String answer = "[\n" +
-//                "    {\n" +
-//                "        \"name\": \"완도전복\",\n" +
-//                "        \"description\": \"산지직송 완도 전복 1kg (7미~60미)\",\n" +
-//                "        \"price\": \"50,000 ~ \"\n" +
-//                "    },\n" +
-//                "    {\n" +
-//                "        \"name\": \"노르웨이산 연어\",\n" +
-//                "        \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
-//                "        \"price\": \"10,000 ~ \"\n" +
-//                "    }\n" +
-//                "]";
-//
-//        List<ProductDto> parsedProductDto = mapper.readValue(answer, new TypeReference<List<ProductDto>>() {
-//        });
-//        System.out.println("parsedProductDto = " + parsedProductDto);
+        List<ProductDto> parsedProductDto = mapper.readValue(answer, new TypeReference<>() {
+        });
+
+        assertThat(productDto.toString()).isEqualTo(parsedProductDto.toString());
+    }
+
+    @Test
+    @DisplayName("상품 상세조회 API")
+    void readProductDetail() {
+
+    }
+
+    @Test
+    @DisplayName("수령일 선택 목록 API")
+    void readDeliveryDate() throws JsonProcessingException {
+//        List<ProductDeliveryDateDto> productDeliveryDateDtos = productService.readDeliveryDate();
+
+        String answer = "[\n" +
+                "{\n" +
+                "\"date\": \"9월 21일 화요일\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"date\": \"9월 22일 수요일\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"date\": \"9월 23일 목요일\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"date\": \"9월 24일 금요일\"\n" +
+                "},\n" +
+                "{\n" +
+                "\"date\": \"9월 25일 토요일\"\n" +
+                "}\n" +
+                "]\n";
+        List<ProductDeliveryDateDto> productDeliveryDateDtos = mapper.readValue(answer, new TypeReference<>() {
+        });
+
+        System.out.println("productDeliveryDateDtos = " + productDeliveryDateDtos);
+
+    }
+
+    @Test
+    @DisplayName("점포 삭제 API")
+    void deleteProduct() {
 
     }
 }
