@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> readAll() {
         List<Product> productList = productRepository.findAll();
         List<ProductDto> productDto = new ArrayList<>();
-        productList.stream().sorted(Comparator.comparing(Product::getId).reversed()).forEach(product -> {
+        productList.stream().sorted(Comparator.comparing(Product::getCreatedAt).reversed()).forEach(product -> {
             Optional<ProductOption> minPrice = product.getOptions().stream().min(Comparator.comparingLong(ProductOption::getPrice));
             String price = "";
             if (minPrice.isPresent()) {
