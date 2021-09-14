@@ -2,6 +2,7 @@ package com.tpirates.market.product;
 
 import com.tpirates.market.product.dto.*;
 import com.tpirates.market.product.entity.Product;
+import com.tpirates.market.product.entity.ProductDelivery;
 import com.tpirates.market.product.entity.ProductOption;
 import com.tpirates.market.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,12 +70,44 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDeliveryDateDto> readDeliveryDate(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            Date createdAt = product.getCreatedAt();
+            ProductDelivery delivery = product.getDelivery();
+            String deliveryClosing = delivery.getClosing();
+            String deliveryType = delivery.getType();
+            return calculateDeliveryDate(createdAt, deliveryClosing, deliveryType);
+        }
         return null;
     }
 
-    @Override
-    public Product update(ProductPostDto productPostDto) {
-        return null;
+    private List<ProductDeliveryDateDto> calculateDeliveryDate(Date date, String deliveryClosing, String deliveryType) {
+        List<ProductDeliveryDateDto> productDeliveryDateDtos = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        Calendar deliveryClosingCalendar = Calendar.getInstance();
+        String[] deliveryClosingSplit = deliveryClosing.split(":");
+        int hour = Integer.parseInt(deliveryClosingSplit[0]);
+        int minute = Integer.parseInt(deliveryClosingSplit[1]);
+        deliveryClosingCalendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), hour, minute, 0);
+
+        if (calendar.compareTo(deliveryClosingCalendar) > 0) calendar.add(Calendar.DATE, 1);
+        if (!deliveryType.equals("fast")) calendar.add(Calendar.DATE, 1);
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) calendar.add(Calendar.DATE, 2);
+        else if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) calendar.add(Calendar.DATE, 1);
+        calendar.add(Calendar.DATE, 1);
+
+        int i = 0;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("M월 d일 EEEE", Locale.KOREAN);
+        while (i < 5) {
+            if (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                productDeliveryDateDtos.add(new ProductDeliveryDateDto(dateFormat.format(calendar.getTime())));
+                i++;
+            }
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        return productDeliveryDateDtos;
     }
 
 

@@ -18,8 +18,6 @@ public interface ProductService {
 
     List<ProductDeliveryDateDto> readDeliveryDate(Long productId);
 
-    Product update(ProductPostDto productPostDto);
-
     void delete(Long productId);
 
 }
