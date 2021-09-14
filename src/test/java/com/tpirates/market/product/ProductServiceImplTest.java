@@ -12,21 +12,19 @@ import com.tpirates.market.product.repository.MemoryProductRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProductServiceImplTest {
 
-    private MemoryProductRepository memoryProductRepository = new MemoryProductRepository();
-    private ProductService productService = new ProductServiceImpl(memoryProductRepository);
+    private final MemoryProductRepository memoryProductRepository = new MemoryProductRepository();
+    private final ProductService productService = new ProductServiceImpl(memoryProductRepository);
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @AfterEach
     void tearDown() {
@@ -36,92 +34,28 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("점포 추가 API")
     void productCreate() throws JsonProcessingException {
-        ProductPostDto product = mapper.readValue("{\n" +
-                "    \"name\": \"노르웨이산 연어\",\n" +
-                "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
-                "    \"delivery\": {\n" +
-                "        \"type\": \"fast\",\n" +
-                "        \"closing\": \"12:00\"\n" +
-                "    },\n" +
-                "    \"options\": [\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 300g\",\n" +
-                "            \"price\": 10000,\n" +
-                "            \"stock\": 99\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 500g\",\n" +
-                "            \"price\": 17000,\n" +
-                "            \"stock\": 99\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}", ProductPostDto.class);
+        ProductPostDto product = getSalmonProductPostDto();
 
         Product createdProduct = productService.create(product);
 
-        List<ProductDto> productDtos = productService.readAll();
+        List<ProductDto> productDtoList = productService.readAll();
 
-        assertThat(productDtos.size()).isEqualTo(1);
+        assertThat(productDtoList.size()).isEqualTo(1);
         assertThat(createdProduct.getName()).isEqualTo(product.getName());
         assertThat(createdProduct.getDescription()).isEqualTo(product.getDescription());
         assertThat(createdProduct.getDelivery()).isEqualTo(product.getDelivery());
         assertThat(createdProduct.getOptions().toString()).isEqualTo(product.getOptions().toString());
     }
 
+
     @Test
     @DisplayName("상품 목록 조회 API")
     void readProductList() throws JsonProcessingException, InterruptedException {
-        ProductPostDto product1 = mapper.readValue("{\n" +
-                "    \"name\": \"노르웨이산 연어\",\n" +
-                "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
-                "    \"delivery\": {\n" +
-                "        \"type\": \"fast\",\n" +
-                "        \"closing\": \"12:00\"\n" +
-                "    },\n" +
-                "    \"options\": [\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 300g\",\n" +
-                "            \"price\": 10000,\n" +
-                "            \"stock\": 99\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 500g\",\n" +
-                "            \"price\": 17000,\n" +
-                "            \"stock\": 99\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}", ProductPostDto.class);
-
-        ProductPostDto product2 = mapper.readValue("{\n" +
-                "    \"name\": \"완도전복\",\n" +
-                "    \"description\": \"산지직송 완도 전복 1kg (7미~60미)\",\n" +
-                "    \"delivery\": {\n" +
-                "        \"type\": \"regular\",\n" +
-                "        \"closing\": \"18:00\"\n" +
-                "    },\n" +
-                "    \"options\": [\n" +
-                "        {\n" +
-                "            \"name\": \"대 7~8미\",\n" +
-                "            \"price\": 50000,\n" +
-                "            \"stock\": 99\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"중 14~15미\",\n" +
-                "            \"price\": 34000,\n" +
-                "            \"stock\": 99\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"소 50~60미\",\n" +
-                "            \"price\": 20000,\n" +
-                "            \"stock\": 99\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}", ProductPostDto.class);
+        ProductPostDto product1 = getSalmonProductPostDto();
+        ProductPostDto product2 = getAbaloneProductPostDto();
 
         Date createdAt1 = productService.create(product1).getCreatedAt();
-
         TimeUnit.MILLISECONDS.sleep(1);
-
         Date createdAt2 = productService.create(product2).getCreatedAt();
 
         assertThat(createdAt1.compareTo(createdAt2)).isEqualTo(-1);
@@ -151,26 +85,7 @@ class ProductServiceImplTest {
     @DisplayName("상품 상세조회 API")
     void readProductDetail() throws JsonProcessingException {
 
-        ProductPostDto product = mapper.readValue("{\n" +
-                "    \"name\": \"노르웨이산 연어\",\n" +
-                "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
-                "    \"delivery\": {\n" +
-                "        \"type\": \"fast\",\n" +
-                "        \"closing\": \"12:00\"\n" +
-                "    },\n" +
-                "    \"options\": [\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 300g\",\n" +
-                "            \"price\": 10000,\n" +
-                "            \"stock\": 99\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 500g\",\n" +
-                "            \"price\": 17000,\n" +
-                "            \"stock\": 99\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}", ProductPostDto.class);
+        ProductPostDto product = getSalmonProductPostDto();
 
         Product createdProduct = productService.create(product);
 
@@ -200,34 +115,13 @@ class ProductServiceImplTest {
     @DisplayName("수령일 선택 목록 API")
     void readDeliveryDate() throws JsonProcessingException {
 
-        ProductPostDto product = mapper.readValue("{\n" +
-                "    \"name\": \"노르웨이산 연어\",\n" +
-                "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
-                "    \"delivery\": {\n" +
-                "        \"type\": \"fast\",\n" +
-                "        \"closing\": \"12:00\"\n" +
-                "    },\n" +
-                "    \"options\": [\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 300g\",\n" +
-                "            \"price\": 10000,\n" +
-                "            \"stock\": 99\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"생연어 몸통살 500g\",\n" +
-                "            \"price\": 17000,\n" +
-                "            \"stock\": 99\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}", ProductPostDto.class);
+        ProductPostDto product = getSalmonProductPostDto();
 
         Product createdProduct = productService.create(product);
 
-        Optional<Product> optionalProduct = memoryProductRepository.findById(createdProduct.getId());
+        List<ProductDeliveryDateDto> productDeliveryDateDtoList = productService.readDeliveryDate(createdProduct.getId());
 
-        List<ProductDeliveryDateDto> productDeliveryDateDtos = productService.readDeliveryDate(createdProduct.getId());
-
-        assertThat(productDeliveryDateDtos.size()).isEqualTo(5);
+        assertThat(productDeliveryDateDtoList.size()).isEqualTo(5);
 
     }
 
@@ -235,7 +129,18 @@ class ProductServiceImplTest {
     @DisplayName("점포 삭제 API")
     void deleteProduct() throws JsonProcessingException {
 
-        ProductPostDto product = mapper.readValue("{\n" +
+        ProductPostDto product = getSalmonProductPostDto();
+
+        Product createdProduct = productService.create(product);
+        assertThat(productService.readOne(createdProduct.getId())).isNotNull();
+
+        productService.delete(createdProduct.getId());
+        assertThat(productService.readOne(createdProduct.getId())).isNull();
+
+    }
+
+    private ProductPostDto getSalmonProductPostDto() throws JsonProcessingException {
+        return mapper.readValue("{\n" +
                 "    \"name\": \"노르웨이산 연어\",\n" +
                 "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
                 "    \"delivery\": {\n" +
@@ -255,12 +160,33 @@ class ProductServiceImplTest {
                 "        }\n" +
                 "    ]\n" +
                 "}", ProductPostDto.class);
+    }
 
-        Product createdProduct = productService.create(product);
-        assertThat(productService.readOne(createdProduct.getId())).isNotNull();
-
-        productService.delete(createdProduct.getId());
-        assertThat(productService.readOne(createdProduct.getId())).isNull();
-
+    private ProductPostDto getAbaloneProductPostDto() throws JsonProcessingException {
+        return mapper.readValue("{\n" +
+                "    \"name\": \"완도전복\",\n" +
+                "    \"description\": \"산지직송 완도 전복 1kg (7미~60미)\",\n" +
+                "    \"delivery\": {\n" +
+                "        \"type\": \"regular\",\n" +
+                "        \"closing\": \"18:00\"\n" +
+                "    },\n" +
+                "    \"options\": [\n" +
+                "        {\n" +
+                "            \"name\": \"대 7~8미\",\n" +
+                "            \"price\": 50000,\n" +
+                "            \"stock\": 99\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"name\": \"중 14~15미\",\n" +
+                "            \"price\": 34000,\n" +
+                "            \"stock\": 99\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"name\": \"소 50~60미\",\n" +
+                "            \"price\": 20000,\n" +
+                "            \"stock\": 99\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}", ProductPostDto.class);
     }
 }
