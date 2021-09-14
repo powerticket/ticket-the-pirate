@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tpirates.market.product.dto.ProductDeliveryDateDto;
+import com.tpirates.market.product.dto.ProductDetailDto;
 import com.tpirates.market.product.dto.ProductDto;
 import com.tpirates.market.product.dto.ProductPostDto;
 import com.tpirates.market.product.entity.Product;
@@ -26,7 +27,6 @@ class ProductServiceImplTest {
 
     private MemoryProductRepository memoryProductRepository = new MemoryProductRepository();
     private ProductService productService = new ProductServiceImpl(memoryProductRepository);
-//    private ProductService productService = new ProductServiceImpl(new MemoryProductRepository());
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -151,8 +151,51 @@ class ProductServiceImplTest {
 
     @Test
     @DisplayName("상품 상세조회 API")
-    void readProductDetail() {
+    void readProductDetail() throws JsonProcessingException {
 
+        ProductPostDto product = mapper.readValue("{\n" +
+                "    \"name\": \"노르웨이산 연어\",\n" +
+                "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
+                "    \"delivery\": {\n" +
+                "        \"type\": \"fast\",\n" +
+                "        \"closing\": \"12:00\"\n" +
+                "    },\n" +
+                "    \"options\": [\n" +
+                "        {\n" +
+                "            \"name\": \"생연어 몸통살 300g\",\n" +
+                "            \"price\": 10000,\n" +
+                "            \"stock\": 99\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"name\": \"생연어 몸통살 500g\",\n" +
+                "            \"price\": 17000,\n" +
+                "            \"stock\": 99\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}", ProductPostDto.class);
+
+        Product createdProduct = productService.create(product);
+
+        ProductDetailDto productDetailDto = productService.readOne(createdProduct.getId());
+
+        String answer = "{\n" +
+                "\"name\": \"노르웨이산 연어\",\n" +
+                "\"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
+                "\"delivery\": \"fast\",\n" +
+                "\"options\": [\n" +
+                "{\n" +
+                "\"name\": \"생연어 몸통살 300g\",\n" +
+                "\"price\": 10000\n" +
+                "},\n" +
+                "{\n" +
+                "\"name\": \"생연어 몸통살 500g\",\n" +
+                "\"price\": 17000\n" +
+                "}\n" +
+                "]\n" +
+                "}";
+        ProductDetailDto answerProductDetailDto = mapper.readValue(answer, ProductDetailDto.class);
+
+        assertThat(productDetailDto.toString()).isEqualTo(answerProductDetailDto.toString());
     }
 
     @Test
@@ -187,6 +230,12 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("점포 삭제 API")
     void deleteProduct() {
-
+        Product product = new Product();
+        Product save = memoryProductRepository.save(product);
+        List<Product> all1 = memoryProductRepository.findAll();
+        assertThat(all1.size()).isEqualTo(1);
+        memoryProductRepository.delete(save);
+        List<Product> all2 = memoryProductRepository.findAll();
+        assertThat(all2.size()).isEqualTo(0);
     }
 }
