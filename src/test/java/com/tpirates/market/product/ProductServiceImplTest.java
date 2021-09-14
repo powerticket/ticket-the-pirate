@@ -2,6 +2,7 @@ package com.tpirates.market.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tpirates.market.product.dto.ProductDetailDto;
 import com.tpirates.market.product.dto.ProductDto;
 import com.tpirates.market.product.dto.ProductPostDto;
 import com.tpirates.market.product.entity.Product;
@@ -50,7 +51,9 @@ class ProductServiceImplTest {
 
         Product createdProduct = productService.create(product);
 
-        assertThat(createdProduct.getId()).isEqualTo(1L);
+        List<ProductDto> productDtos = productService.readAll();
+
+        assertThat(productDtos.size()).isEqualTo(1);
         assertThat(createdProduct.getName()).isEqualTo(product.getName());
         assertThat(createdProduct.getDescription()).isEqualTo(product.getDescription());
         assertThat(createdProduct.getDelivery()).isEqualTo(product.getDelivery());
