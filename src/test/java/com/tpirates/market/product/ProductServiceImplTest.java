@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -71,7 +72,7 @@ class ProductServiceImplTest {
 
     @Test
     @DisplayName("상품 목록 조회 API")
-    void readProductList() throws JsonProcessingException {
+    void readProductList() throws JsonProcessingException, InterruptedException {
         ProductPostDto product1 = mapper.readValue("{\n" +
                 "    \"name\": \"노르웨이산 연어\",\n" +
                 "    \"description\": \"노르웨이산 연어 300g, 500g, 반마리 필렛\",\n" +
@@ -119,9 +120,13 @@ class ProductServiceImplTest {
                 "    ]\n" +
                 "}", ProductPostDto.class);
 
-        productService.create(product1);
-        productService.create(product2);
+        Date createdAt1 = productService.create(product1).getCreatedAt();
 
+        TimeUnit.MILLISECONDS.sleep(1);
+
+        Date createdAt2 = productService.create(product2).getCreatedAt();
+
+        assertThat(createdAt1.compareTo(createdAt2)).isEqualTo(-1);
 
         List<ProductDto> productDto = productService.readAll();
 
