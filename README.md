@@ -2,13 +2,13 @@
 
 ## Table of Contents
 
-- [설치 및 환경설정 가이드](#-------------)
-  * [[Spring initializr](https://start.spring.io/)](#-spring-initializr--https---startspringio--)
+- [설치 및 환경설정 가이드](#설치-및-환경설정-가이드)
+  * [Spring initializr](#spring-initializr)
   * [Settings](#settings)
-- [테이블 생성 SQL](#-------sql)
+- [테이블 생성 SQL](#테이블-생성-sql)
   * [ERD](#erd)
   * [Initializing SQL](#initializing-sql)
-- [API 사용 가이드](#api-------)
+- [API 사용 가이드](#api-사용-가이드)
   * [Quickstart](#quickstart)
   * [API](#api)
     + [Scheme](#scheme)
