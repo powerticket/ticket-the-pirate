@@ -1,5 +1,7 @@
 package com.tpirates.market.product;
 
+import com.tpirates.market.common.ErrorInfo;
+import com.tpirates.market.common.exception.NotFoundException;
 import com.tpirates.market.product.dto.*;
 import com.tpirates.market.product.entity.Product;
 import com.tpirates.market.product.entity.ProductDelivery;
@@ -44,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
                             .build()
             );
         });
-        return productDto;
+        throw new NotFoundException(ErrorInfo.PRODUCT_NOT_FOUND.getErrorCode(), ErrorInfo.PRODUCT_NOT_FOUND.getErrorMessage());
     }
 
     @Override
@@ -65,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
                     .options(productDetailOptionDtos)
                     .build();
         }
-        return null;
+        throw new NotFoundException(ErrorInfo.PRODUCT_NOT_FOUND.getErrorCode(), ErrorInfo.PRODUCT_NOT_FOUND.getErrorMessage());
     }
 
     @Override
@@ -79,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
             String deliveryType = delivery.getType();
             return calculateDeliveryDate(createdAt, deliveryClosing, deliveryType);
         }
-        return null;
+        throw new NotFoundException(ErrorInfo.PRODUCT_NOT_FOUND.getErrorCode(), ErrorInfo.PRODUCT_NOT_FOUND.getErrorMessage());
     }
 
     private List<ProductDeliveryDateDto> calculateDeliveryDate(Date date, String deliveryClosing, String deliveryType) {
@@ -113,6 +115,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Long id) {
-        productRepository.findById(id).ifPresent(productRepository::delete);
+
+        productRepository.findById(id).ifPresentOrElse(productRepository::delete, () -> {
+            throw new NotFoundException(ErrorInfo.PRODUCT_NOT_FOUND.getErrorCode(), ErrorInfo.PRODUCT_NOT_FOUND.getErrorMessage());
+        });
     }
 }
