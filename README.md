@@ -10,3 +10,20 @@
 
 ## API 사용 가이드
 
+### Quickstart
+
+```bash
+$ git clone https://github.com/powerticket/ticket-the-pirate.git
+$ cd ticket-the-pirate
+$ ./gradlew clean build
+$ java -jar build/libs/*.jar
+```
+
+or using docker
+
+```bash
+$ docker run -dp 8080:8080 powerticket/ticket-the-pirate
+```
+
+### Check API with Postman
+
