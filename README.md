@@ -25,8 +25,8 @@
 ```bash
 $ git clone https://github.com/powerticket/ticket-the-pirate.git
 $ cd ticket-the-pirate
-$ ./gradlew clean build -Dfile.encoding=UTF-8
-$ java -jar build/libs/*-SNAPSHOT.jar
+$ ./gradlew -Dfile.encoding=UTF-8 clean build
+$ java -jar -Dfile.encoding=UTF-8 build/libs/*-SNAPSHOT.jar
 ```
 
 or using docker
