@@ -25,7 +25,7 @@
 ```bash
 $ git clone https://github.com/powerticket/ticket-the-pirate.git
 $ cd ticket-the-pirate
-$ ./gradlew clean build
+$ ./gradlew clean build -Dfile.encoding=UTF-8
 $ java -jar build/libs/*-SNAPSHOT.jar
 ```
 
