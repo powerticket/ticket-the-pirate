@@ -46,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
                             .build()
             );
         });
-        throw new NotFoundException(ErrorInfo.PRODUCT_NOT_FOUND.getErrorCode(), ErrorInfo.PRODUCT_NOT_FOUND.getErrorMessage());
+        return productDto;
     }
 
     @Override

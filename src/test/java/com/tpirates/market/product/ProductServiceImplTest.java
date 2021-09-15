@@ -3,6 +3,7 @@ package com.tpirates.market.product;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tpirates.market.common.exception.NotFoundException;
 import com.tpirates.market.product.dto.ProductDeliveryDateDto;
 import com.tpirates.market.product.dto.ProductDetailDto;
 import com.tpirates.market.product.dto.ProductDto;
@@ -10,6 +11,7 @@ import com.tpirates.market.product.dto.ProductPostDto;
 import com.tpirates.market.product.entity.Product;
 import com.tpirates.market.product.repository.MemoryProductRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -135,7 +137,9 @@ class ProductServiceImplTest {
         assertThat(productService.readOne(createdProduct.getId())).isNotNull();
 
         productService.delete(createdProduct.getId());
-        assertThat(productService.readOne(createdProduct.getId())).isNull();
+        Assertions.assertThrows(NotFoundException.class, () ->
+                productService.readOne(createdProduct.getId())
+        );
 
     }
 
