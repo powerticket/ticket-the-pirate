@@ -40,7 +40,7 @@ class ProductServiceImplIntTest {
 
         List<ProductDto> productDtoList = productService.readAll();
 
-        assertThat(productDtoList.size()).isEqualTo(1);
+        assertThat(productDtoList.size()).isEqualTo(3);
         assertThat(createdProduct.getName()).isEqualTo(product.getName());
         assertThat(createdProduct.getDescription()).isEqualTo(product.getDescription());
         assertThat(createdProduct.getDelivery()).isEqualTo(product.getDelivery());
@@ -51,15 +51,6 @@ class ProductServiceImplIntTest {
     @Test
     @DisplayName("상품 목록 조회 API")
     void readProductList() throws JsonProcessingException, InterruptedException {
-        ProductPostDto product1 = getSalmonProductPostDto();
-        ProductPostDto product2 = getAbaloneProductPostDto();
-
-        Date createdAt1 = productService.create(product1).getCreatedAt();
-        TimeUnit.MILLISECONDS.sleep(1);
-        Date createdAt2 = productService.create(product2).getCreatedAt();
-
-        assertThat(createdAt1.compareTo(createdAt2)).isEqualTo(-1);
-
         List<ProductDto> productDto = productService.readAll();
 
         String answer = "[\n" +
@@ -79,6 +70,15 @@ class ProductServiceImplIntTest {
         });
 
         assertThat(productDto.toString()).isEqualTo(parsedProductDto.toString());
+
+        ProductPostDto product1 = getSalmonProductPostDto();
+        ProductPostDto product2 = getAbaloneProductPostDto();
+
+        Date createdAt1 = productService.create(product1).getCreatedAt();
+        TimeUnit.MILLISECONDS.sleep(1);
+        Date createdAt2 = productService.create(product2).getCreatedAt();
+
+        assertThat(createdAt1.compareTo(createdAt2)).isEqualTo(-1);
     }
 
     @Test
