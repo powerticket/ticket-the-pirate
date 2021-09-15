@@ -6,8 +6,9 @@ spring:
 #  h2 db info
   datasource:
     url: jdbc:h2:mem:testdb
+    initialization-mode: always
 #  jpa sql show and auto update table
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
