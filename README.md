@@ -3,15 +3,14 @@
 ## Table of Contents
 
 - [설치 및 환경설정 가이드](#설치-및-환경설정-가이드)
+  * [Quickstart](#quickstart)
   * [Spring initializr](#spring-initializr)
   * [Settings](#settings)
 - [테이블 생성 SQL](#테이블-생성-sql)
   * [ERD](#erd)
   * [Initializing SQL](#initializing-sql)
 - [API 사용 가이드](#api-사용-가이드)
-  * [Quickstart](#quickstart)
-  * [API](#api)
-    + [Scheme](#scheme)
+  * [Scheme](#scheme)
   * [Check with Postman](#check-with-postman)
     + [POST /product](#post--product)
     + [GET /product](#get--product)
@@ -20,6 +19,21 @@
     + [DELETE /product/{id}](#delete--product--id-)
 
 ## 설치 및 환경설정 가이드
+
+### Quickstart
+
+```bash
+$ git clone https://github.com/powerticket/ticket-the-pirate.git
+$ cd ticket-the-pirate
+$ ./gradlew clean build
+$ java -jar build/libs/*-SNAPSHOT.jar
+```
+
+or using docker
+
+```bash
+$ docker run -dp 8080:8080 powerticket/ticket-the-pirate
+```
 
 ### [Spring initializr](https://start.spring.io/)
 
@@ -139,24 +153,7 @@ INSERT INTO product_options (product_id, options_id) VALUES (2, 5);
 
 ## API 사용 가이드
 
-### Quickstart
-
-```bash
-$ git clone https://github.com/powerticket/ticket-the-pirate.git
-$ cd ticket-the-pirate
-$ ./gradlew clean build
-$ java -jar build/libs/*-SNAPSHOT.jar
-```
-
-or using docker
-
-```bash
-$ docker run -dp 8080:8080 powerticket/ticket-the-pirate
-```
-
-### API
-
-#### Scheme
+### Scheme
 
 base url: http://localhost:8080
 
